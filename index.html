@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<!--
+  DEPLOY NOTES (delete this comment once you're set up):
+  1. Put your zip file in this same folder, next to this index.html.
+  2. Update the ZIP_FILENAME constant in the <script> near the bottom to match its exact filename.
+  3. Push this folder (index.html + the zip) to a GitHub repo, then connect it as a
+     Cloudflare Pages project (or drag-and-drop deploy the folder directly in the
+     Cloudflare Pages dashboard if you don't want a repo for this one).
+  4. The page auto-detects the zip's file size on load via a HEAD request — no need
+     to hardcode it.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity Materials — Download</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDEFE6;
+    --paper-line: #C9CFC3;
+    --ink: #20261F;
+    --ink-soft: #4B5449;
+    --teal: #1C4A45;
+    --teal-dark: #123330;
+    --gold: #B98A2E;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+
+  /* faint ruled-paper texture, very subtle */
+  body {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 39px,
+      var(--paper-line) 40px
+    );
+    background-size: 100% 40px;
+    background-attachment: local;
+  }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 96px 32px 120px;
+  }
+
+  .kicker {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+
+  h1 {
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    line-height: 1.2;
+    margin: 0 0 28px;
+    max-width: 15ch;
+  }
+
+  .intro {
+    max-width: 58ch;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    margin: 0 0 44px;
+  }
+
+  .download-block {
+    margin-top: 44px;
+    background: transparent;
+    padding: 0;
+  }
+
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--teal);
+    color: #F4F6F0;
+    text-decoration: none;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 16px 26px;
+    border-radius: 4px;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+
+  .download-btn:hover {
+    background: var(--teal-dark);
+    transform: translateY(-2px);
+  }
+
+  .download-btn:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  .download-btn svg { flex-shrink: 0; }
+
+  .meta {
+    margin-top: 14px;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  footer {
+    margin-top: 80px;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--paper-line);
+    padding-top: 20px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .download-btn { transition: none; }
+  }
+
+  @media (max-width: 480px) {
+    .wrap { padding: 64px 20px 80px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="kicker">Semester Zero Foundation Programme &middot; Equip, Day 3</p>
+    <h1>Activity Materials</h1>
+    <p class="intro">
+      Download the zip file below to get the files you'll need for today's practical.
+    </p>
+
+    <div class="download-block">
+      <a class="download-btn" id="downloadBtn" href="#" download>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download workshop materials
+      </a>
+      <p class="meta" id="fileMeta">ZIP file</p>
+    </div>
+
+    <footer>
+      Questions about anything in here? Bring them to the next session.
+    </footer>
+  </div>
+
+  <script>
+    // Update this to match your zip's exact filename in this same folder.
+    const ZIP_FILENAME = 'course-materials.zip';
+
+    const btn = document.getElementById('downloadBtn');
+    const meta = document.getElementById('fileMeta');
+    btn.href = ZIP_FILENAME;
+
+    fetch(ZIP_FILENAME, { method: 'HEAD' })
+      .then(res => {
+        if (!res.ok) throw new Error('not found');
+        const bytes = parseInt(res.headers.get('content-length') || '0', 10);
+        if (bytes > 0) {
+          const mb = bytes / (1024 * 1024);
+          const size = mb >= 1 ? mb.toFixed(1) + ' MB' : Math.round(bytes / 1024) + ' KB';
+          meta.textContent = 'ZIP file · ' + size;
+        }
+      })
+      .catch(() => {
+        meta.textContent = 'ZIP file (add ' + ZIP_FILENAME + ' to this folder)';
+      });
+  </script>
+</body>
+</html>
